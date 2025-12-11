@@ -1,0 +1,5 @@
+name: "English"
+code: "en"
+script: "Latin"
+alphabet: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-:;\"'()[]"
+special_tokens: ["<PAD>", "<UNK>", "<SOS>", "<EOS>", "<BLK>"]

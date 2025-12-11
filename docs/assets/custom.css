@@ -1,0 +1,29 @@
+:root {
+    /* Thulium Branding Colors */
+    --thulium-deep-purple: #5A2A82;
+    --thulium-rich-purple: #7D3CB5;
+    --thulium-bg-neutral: #F4F4F7;
+    --thulium-text-dark: #121212;
+}
+
+body {
+    background-color: var(--thulium-bg-neutral);
+    color: var(--thulium-text-dark);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--thulium-deep-purple);
+}
+
+a {
+    color: var(--thulium-rich-purple);
+    text-decoration: none;
+}
+
+.badge {
+    background-color: var(--thulium-rich-purple);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}

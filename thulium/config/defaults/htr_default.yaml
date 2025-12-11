@@ -1,0 +1,15 @@
+pipeline:
+  name: "htr_standard_en"
+  steps:
+    - segmentation
+    - recognition
+  segmentation:
+    model: "unet_line_v1"
+    device: "auto"
+  recognition:
+    backbone: "resnet"
+    head: "bilstm"
+    decoder: "ctc"
+    language_model: null
+  postprocessing:
+    spellcheck: false

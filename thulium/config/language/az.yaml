@@ -1,0 +1,6 @@
+name: "Azerbaijani"
+code: "az"
+script: "Latin"
+alphabet: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-:;\"'()[]çəğıöşüÇƏĞIÖŞÜ"
+special_tokens: ["<PAD>", "<UNK>", "<SOS>", "<EOS>", "<BLK>"]
+dataset_urls: []

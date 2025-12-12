@@ -4,9 +4,9 @@
 site_name: Thulium
 site_description: State-of-the-art multilingual handwriting text recognition
 site_author: Thulium Authors
-site_url: https://thulium-dev.github.io/thulium/
-repo_name: thulium-dev/thulium
-repo_url: https://github.com/thulium-dev/thulium
+site_url: https://thulium-htr.github.io/thulium/
+repo_name: thulium-htr/thulium
+repo_url: https://github.com/thulium-htr/thulium
 edit_uri: edit/main/docs/
 
 copyright: Copyright &copy; 2025 Thulium Authors
@@ -86,6 +86,6 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/thulium-dev/thulium
+      link: https://github.com/thulium-htr/thulium
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/thulium/

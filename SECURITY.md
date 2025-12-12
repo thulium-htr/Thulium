@@ -16,7 +16,7 @@ responsibly.
 ### How to Report
 
 1. **Do not** open a public issue
-2. Email security concerns to: security@thulium-dev.io
+2. Email security concerns to: security@thulium-htr.io
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce

@@ -17,7 +17,7 @@
 This module enables loading Thulium models via PyTorch Hub:
 
     import torch
-    model = torch.hub.load('olaflaitinen/Thulium', 'thulium_base')
+    model = torch.hub.load('thulium-htr/Thulium', 'thulium_base')
 
 See https://pytorch.org/hub/ for more information.
 """
@@ -40,7 +40,7 @@ def thulium_tiny(pretrained: bool = True, **kwargs):
         
     Example:
         >>> import torch
-        >>> model = torch.hub.load('olaflaitinen/Thulium', 'thulium_tiny')
+        >>> model = torch.hub.load('thulium-htr/Thulium', 'thulium_tiny')
     """
     from thulium import HTRPipeline
     
@@ -62,7 +62,7 @@ def thulium_base(pretrained: bool = True, **kwargs):
         
     Example:
         >>> import torch
-        >>> model = torch.hub.load('olaflaitinen/Thulium', 'thulium_base')
+        >>> model = torch.hub.load('thulium-htr/Thulium', 'thulium_base')
     """
     from thulium import HTRPipeline
     
@@ -84,7 +84,7 @@ def thulium_large(pretrained: bool = True, **kwargs):
         
     Example:
         >>> import torch
-        >>> model = torch.hub.load('olaflaitinen/Thulium', 'thulium_large')
+        >>> model = torch.hub.load('thulium-htr/Thulium', 'thulium_large')
     """
     from thulium import HTRPipeline
     
@@ -106,7 +106,7 @@ def thulium_multilingual(pretrained: bool = True, **kwargs):
         
     Example:
         >>> import torch
-        >>> model = torch.hub.load('olaflaitinen/Thulium', 'thulium_multilingual')
+        >>> model = torch.hub.load('thulium-htr/Thulium', 'thulium_multilingual')
         >>> result = model.recognize(image, language="de")
     """
     from thulium import HTRPipeline

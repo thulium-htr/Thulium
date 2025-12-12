@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.1] - 2025-12-12
 
 ### Added
-- **PyTorch Hub Support**: Load models directly via `torch.hub.load('olaflaitinen/Thulium', ...)`
+- **PyTorch Hub Support**: Load models directly via `torch.hub.load('thulium-htr/Thulium', ...)`
 - **Documentation Overhaul**: Complete rewrite of all documentation to Google Open Source standards
 - **Interactive Notebooks**: Added Colab-ready notebooks for quickstart, benchmarking, and error analysis
 - **Professional Standards**: Added SECURITY.md, SUPPORT.md, AUTHORS.md, and CITATION.cff
@@ -65,6 +65,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/thulium-dev/thulium/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/thulium-dev/thulium/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/thulium-dev/thulium/releases/tag/v1.0.0
+[Unreleased]: https://github.com/thulium-htr/Thulium/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/thulium-htr/Thulium/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/thulium-htr/Thulium/releases/tag/v1.0.0

@@ -61,7 +61,7 @@ Example:
     >>> for result in results:
     ...     print(f"{result.text} ({result.confidence:.2%})")
 
-For more information, see https://github.com/olaflaitinen/Thulium.
+For more information, see https://github.com/thulium-htr/Thulium.
 """
 
 from __future__ import annotations

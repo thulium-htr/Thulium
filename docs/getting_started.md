@@ -24,7 +24,7 @@ pip install thulium[gpu]
 ### From Source
 
 ```bash
-git clone https://github.com/thulium-dev/thulium.git
+git clone https://github.com/thulium-htr/thulium.git
 cd thulium
 pip install -e ".[dev]"
 ```

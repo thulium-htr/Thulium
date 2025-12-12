@@ -30,6 +30,6 @@ If you use Thulium in your research, please cite:
   title={Thulium: Multilingual Handwriting Recognition},
   author={Thulium Authors},
   year={2025},
-  url={https://github.com/thulium-dev/thulium}
+  url={https://github.com/thulium-htr/thulium}
 }
 ```

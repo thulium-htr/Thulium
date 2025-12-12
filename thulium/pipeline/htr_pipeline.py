@@ -125,7 +125,7 @@ class HTRPipeline:
             Initialized HTRPipeline with loaded weights.
         """
         # Map names to URLs (for v1.2.1)
-        GITHUB_RELEASE_URL = "https://github.com/olaflaitinen/Thulium/releases/download/v1.2.1"
+        GITHUB_RELEASE_URL = "https://github.com/thulium-htr/Thulium/releases/download/v1.2.1"
         MODEL_MAP = {
             "thulium-tiny": f"{GITHUB_RELEASE_URL}/thulium-tiny.pt",
             "thulium-base": f"{GITHUB_RELEASE_URL}/thulium-base.pt",
@@ -182,8 +182,12 @@ class HTRPipeline:
     def _load_config(self, path: str) -> Dict[str, Any]:
         """Load configuration from YAML."""
         try:
-            with open(path, "r", encoding="utf-8") as f:
-                return yaml.safe_load(f)
+             import json
+             if path.endswith(".json"):
+                 with open(path, "r", encoding="utf-8") as f:
+                     return json.load(f)
+             with open(path, "r", encoding="utf-8") as f:
+                 return yaml.safe_load(f)
         except Exception as e:
             logger.warning("Failed to load config %s: %s. Using API defaults.", path, e)
             return {}

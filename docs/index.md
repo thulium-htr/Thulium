@@ -65,6 +65,6 @@ installation to advanced model training.
 
 ## Quick Links
 
-- [GitHub Repository](https://github.com/thulium-dev/thulium)
+- [GitHub Repository](https://github.com/thulium-htr/thulium)
 - [PyPI Package](https://pypi.org/project/thulium/)
-- [Issue Tracker](https://github.com/thulium-dev/thulium/issues)
+- [Issue Tracker](https://github.com/thulium-htr/thulium/issues)

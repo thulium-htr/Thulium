@@ -76,8 +76,8 @@ gpu = [
 thulium = "thulium.cli.main:app"
 
 [project.urls]
-"Homepage" = "https://github.com/olaflaitinen/Thulium"
-"Bug Tracker" = "https://github.com/olaflaitinen/Thulium/issues"
+"Homepage" = "https://github.com/thulium-htr/Thulium"
+"Bug Tracker" = "https://github.com/thulium-htr/Thulium/issues"
 "Documentation" = "https://thulium.readthedocs.io"
 
 [tool.setuptools.packages.find]

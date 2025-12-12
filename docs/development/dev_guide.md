@@ -13,7 +13,7 @@ Set up a development environment for contributing to Thulium.
 ### Clone Repository
 
 ```bash
-git clone https://github.com/thulium-dev/thulium.git
+git clone https://github.com/thulium-htr/thulium.git
 cd thulium
 ```
 

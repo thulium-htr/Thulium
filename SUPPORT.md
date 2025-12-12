@@ -12,8 +12,8 @@ Start with our documentation:
 
 ### Community Support
 
-- [GitHub Discussions](https://github.com/thulium-dev/thulium/discussions) — Questions and ideas
-- [GitHub Issues](https://github.com/thulium-dev/thulium/issues) — Bug reports
+- [GitHub Discussions](https://github.com/thulium-htr/thulium/discussions) — Questions and ideas
+- [GitHub Issues](https://github.com/thulium-htr/thulium/issues) — Bug reports
 
 ### Before Asking
 
@@ -85,5 +85,5 @@ When reporting bugs, include:
 
 ## Feature Requests
 
-Open a [GitHub Discussion](https://github.com/thulium-dev/thulium/discussions)
+Open a [GitHub Discussion](https://github.com/thulium-htr/thulium/discussions)
 with the "Ideas" category.

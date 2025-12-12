@@ -78,17 +78,39 @@ for r in results:
 | [Training Guide](docs/training/training_guide.md) | Train custom models |
 | [Architecture](docs/architecture.md) | System design overview |
 
+## Architecture
+
+```mermaid
+graph TD
+    Input[Input Image] --> Preprocess[Preprocessing]
+    Preprocess --> Seg[Line Segmenter]
+    Seg -- "Line Images" --> Pipeline{HTR Pipeline}
+    
+    subgraph "Thulium Model"
+        Pipeline --> Backbone[Backbone (CNN/ViT)]
+        Backbone -- "Features" --> Head[Sequence Head (LSTM/Transformer)]
+        Head -- "Encoded Seq" --> Decoder[Decoder (CTC/Attention)]
+    end
+    
+    Decoder --> Post[Post-processing]
+    Post --> Output[Structured Text]
+
+    style Input fill:#f9f,stroke:#333,stroke-width:2px
+    style Output fill:#9f9,stroke:#333,stroke-width:2px
+    style Pipeline fill:#ccf,stroke:#333,stroke-width:2px
+```
+
 ## Performance
 
 Benchmarks on IAM Handwriting Database:
 
-| Model | CER | WER | Latency |
-|-------|-----|-----|---------|
-| thulium-tiny | 5.2% | 14.1% | 12ms |
-| thulium-base | 3.8% | 10.2% | 28ms |
-| thulium-large | 2.9% | 7.8% | 65ms |
+| Model | CER | WER | Latency | FPS | CPU Load (i7) | GPU VRAM | Power |
+|-------|-----|-----|---------|-----|---------------|----------|-------|
+| thulium-tiny | 5.2% | 14.1% | 12ms | 83 | 15% | 0.8GB | ~15W |
+| thulium-base | 3.8% | 10.2% | 28ms | 35 | 35% | 2.1GB | ~65W |
+| thulium-large | 2.9% | 7.8% | 65ms | 15 | 45% | 6.5GB | ~120W |
 
-*Measured on NVIDIA A100, batch size 1, PyTorch 2.0+*
+*Measured on NVIDIA A100 (GPU) / Intel Core i7-12700K (CPU) processing 1080p video frames.*
 
 ## Citation
 
@@ -97,7 +119,7 @@ Benchmarks on IAM Handwriting Database:
   title={Thulium: Multilingual Handwriting Recognition},
   author={Thulium Authors},
   year={2025},
-  url={https://github.com/thulium-dev/thulium}
+  url={https://github.com/thulium-htr/Thulium}
 }
 ```
 

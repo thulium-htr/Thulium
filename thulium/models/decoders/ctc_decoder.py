@@ -1,5 +1,18 @@
-"""
-CTC Decoder module for Connectionist Temporal Classification decoding.
+# Copyright 2025 Thulium Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""CTC Decoder module for Connectionist Temporal Classification decoding.
 
 This module provides neural network layers and decoding algorithms for CTC-based
 handwriting text recognition, including:
@@ -26,11 +39,16 @@ where:
 - beta is the word insertion bonus/penalty
 - |y| is the sequence length
 """
+from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import List, Optional, Tuple, Protocol
 import math
+from abc import ABC
+from abc import abstractmethod
+from dataclasses import dataclass
+from typing import List
+from typing import Optional
+from typing import Protocol
+from typing import Tuple
 
 import torch
 import torch.nn as nn

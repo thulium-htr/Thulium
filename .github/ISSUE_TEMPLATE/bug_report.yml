@@ -1,0 +1,71 @@
+name: Bug Report
+description: Report a bug in Thulium
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+        
+  - type: input
+    id: version
+    attributes:
+      label: Thulium Version
+      description: Run `python -c "import thulium; print(thulium.__version__)"`
+      placeholder: "1.1.0"
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: true
+      
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is.
+    validations:
+      required: true
+      
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Import thulium
+        2. Call recognize_image(...)
+        3. See error
+    validations:
+      required: true
+      
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+      
+  - type: textarea
+    id: code
+    attributes:
+      label: Minimal Reproducible Example
+      description: A minimal code example that reproduces the issue.
+      render: python
+      
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Message
+      description: Full error traceback if applicable.
+      render: shell

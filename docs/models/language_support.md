@@ -1,225 +1,167 @@
 # Language Support
 
-Thulium provides comprehensive multilingual support through a centralized language profile system. Each language profile encapsulates character sets, tokenization strategies, and decoder configurations.
+Thulium supports 52+ languages across 10 writing scripts.
 
-## Supported Languages Overview
+## Supported Languages
 
-Thulium currently supports **52 languages** across **12 distinct writing systems**.
+### Latin Script (30 languages)
 
-| Script Family | Languages | Direction |
-| :--- | :--- | :--- |
-| Latin | 30+ languages | LTR |
-| Cyrillic | Russian, Ukrainian, Bulgarian, Serbian | LTR |
-| Arabic | Arabic, Persian, Urdu | RTL |
-| Hebrew | Hebrew | RTL |
-| Devanagari | Hindi, Marathi | LTR |
-| Bengali | Bengali | LTR |
-| Tamil | Tamil | LTR |
-| Telugu | Telugu | LTR |
-| Georgian | Georgian | LTR |
-| Armenian | Armenian | LTR |
-| Thai | Thai | LTR |
-| CJK | Chinese, Japanese, Korean | LTR/TTB |
+| Code | Language | Region |
+|------|----------|--------|
+| `en` | English | Global |
+| `de` | German | Western Europe |
+| `fr` | French | Western Europe |
+| `es` | Spanish | Western Europe |
+| `it` | Italian | Western Europe |
+| `pt` | Portuguese | Western Europe |
+| `nl` | Dutch | Western Europe |
+| `pl` | Polish | Eastern Europe |
+| `cs` | Czech | Eastern Europe |
+| `hu` | Hungarian | Eastern Europe |
+| `ro` | Romanian | Eastern Europe |
+| `sv` | Swedish | Scandinavia |
+| `nb` | Norwegian (Bokmål) | Scandinavia |
+| `nn` | Norwegian (Nynorsk) | Scandinavia |
+| `da` | Danish | Scandinavia |
+| `fi` | Finnish | Scandinavia |
+| `is` | Icelandic | Scandinavia |
+| `lt` | Lithuanian | Baltic |
+| `lv` | Latvian | Baltic |
+| `et` | Estonian | Baltic |
+| `tr` | Turkish | Middle East |
+| `az` | Azerbaijani | Caucasus |
+| `id` | Indonesian | Southeast Asia |
+| `ms` | Malay | Southeast Asia |
+| `vi` | Vietnamese | Southeast Asia |
+| `tl` | Filipino | Southeast Asia |
+| `sw` | Swahili | Africa |
+| `hr` | Croatian | Balkans |
+| `sr-latn` | Serbian (Latin) | Balkans |
+| `sl` | Slovenian | Balkans |
 
----
+### Cyrillic Script (8 languages)
 
-## Scandinavian Languages
+| Code | Language | Region |
+|------|----------|--------|
+| `ru` | Russian | Eastern Europe |
+| `uk` | Ukrainian | Eastern Europe |
+| `be` | Belarusian | Eastern Europe |
+| `bg` | Bulgarian | Balkans |
+| `mk` | Macedonian | Balkans |
+| `sr` | Serbian (Cyrillic) | Balkans |
+| `kk` | Kazakh | Central Asia |
+| `mn` | Mongolian | East Asia |
 
-The Scandinavian language group uses extended Latin alphabets with distinctive characters.
+### Arabic Script (4 languages)
 
-| Code | Language | Special Characters | Notes |
-| :--- | :--- | :--- | :--- |
-| `nb` | Norwegian (Bokmal) | ae, o-slash, a-ring | Standard written Norwegian |
-| `nn` | Norwegian (Nynorsk) | ae, o-slash, a-ring | New Norwegian variant |
-| `sv` | Swedish | a-umlaut, o-umlaut, a-ring | |
-| `da` | Danish | ae, o-slash, a-ring | |
-| `is` | Icelandic | eth, thorn, acute accents | Preserves Old Norse characters |
-| `fo` | Faroese | eth, acute accents | |
-| `fi` | Finnish | a-umlaut, o-umlaut | Finno-Ugric; not Indo-European |
+| Code | Language | Direction |
+|------|----------|-----------|
+| `ar` | Arabic | RTL |
+| `fa` | Persian | RTL |
+| `ur` | Urdu | RTL |
+| `ps` | Pashto | RTL |
 
----
+### Hebrew Script
 
-## Baltic Languages
-
-| Code | Language | Special Characters | Notes |
-| :--- | :--- | :--- | :--- |
-| `lt` | Lithuanian | ogonek, caron, macron | |
-| `lv` | Latvian | macron, cedilla, caron | |
-| `et` | Estonian | a-umlaut, o-tilde, o-umlaut | Finno-Ugric language |
-
----
-
-## Caucasus Region
-
-| Code | Language | Script | Special Features |
-| :--- | :--- | :--- | :--- |
-| `az` | Azerbaijani | Latin | Schwa, soft-g, dotless-i, cedilla |
-| `tr` | Turkish | Latin | Dotted I / dotless i distinction |
-| `ka` | Georgian | Georgian | 33-letter Mkhedruli script |
-| `hy` | Armenian | Armenian | 39-letter alphabet |
-
-### Azerbaijani Character Set
-
-The Azerbaijani alphabet includes 32 letters with the following distinctive characters:
-
-- Schwa (uppercase/lowercase)
-- Soft-g (breve)
-- Dotless-i (uppercase/lowercase)
-- O-umlaut, U-umlaut
-- C-cedilla, S-cedilla
-
----
-
-## Western European Languages
-
-| Code | Language | Special Characters | Notes |
-| :--- | :--- | :--- | :--- |
-| `en` | English | None (ASCII base) | Baseline model |
-| `de` | German | a-umlaut, o-umlaut, u-umlaut, eszett | |
-| `fr` | French | Acute, grave, circumflex, cedilla, ligatures | |
-| `es` | Spanish | Acute accents, n-tilde, inverted punctuation | |
-| `pt` | Portuguese | Acute, circumflex, tilde, cedilla | |
-| `it` | Italian | Acute, grave, circumflex | |
-| `nl` | Dutch | Acute, umlaut, circumflex | |
-
----
-
-## Eastern European Languages
-
-### Latin Script
-
-| Code | Language | Special Characters | Notes |
-| :--- | :--- | :--- | :--- |
-| `pl` | Polish | Ogonek, acute, kreska, dot | |
-| `cs` | Czech | Caron, acute | |
-| `sk` | Slovak | Caron, acute, circumflex | |
-| `hu` | Hungarian | Acute, double-acute, umlaut | |
-| `ro` | Romanian | Breve, comma-below, circumflex | |
-| `hr` | Croatian | Caron, acute, stroke | |
-| `sl` | Slovenian | Caron | |
-
-### Cyrillic Script
-
-| Code | Language | Alphabet Size | Notes |
-| :--- | :--- | :--- | :--- |
-| `ru` | Russian | 33 letters | Standard Cyrillic |
-| `uk` | Ukrainian | 33 letters | Includes i, yi, ye |
-| `bg` | Bulgarian | 30 letters | No hard sign |
-| `sr` | Serbian (Cyrillic) | 30 letters | Also supports Latin |
+| Code | Language | Direction |
+|------|----------|-----------|
+| `he` | Hebrew | RTL |
+| `yi` | Yiddish | RTL |
 
 ### Greek Script
 
-| Code | Language | Alphabet Size | Notes |
-| :--- | :--- | :--- | :--- |
-| `el` | Greek | 24 letters | Plus polytonic variants |
+| Code | Language |
+|------|----------|
+| `el` | Greek |
 
----
+### Georgian Script
 
-## Middle East and Central Asia
+| Code | Language |
+|------|----------|
+| `ka` | Georgian |
 
-Right-to-left (RTL) script support includes proper handling of text direction and character shaping.
+### Armenian Script
 
-| Code | Language | Script | Direction | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| `ar` | Arabic | Arabic | RTL | Includes Arabic-Indic numerals |
-| `fa` | Persian (Farsi) | Arabic | RTL | Extended Arabic with pe, che, zhe, gaf |
-| `ur` | Urdu | Arabic | RTL | Extended Arabic alphabet |
-| `he` | Hebrew | Hebrew | RTL | 22 consonant letters |
-
----
-
-## South Asian Languages
+| Code | Language |
+|------|----------|
+| `hy` | Armenian |
 
 ### Devanagari Script
 
-| Code | Language | Base Script | Notes |
-| :--- | :--- | :--- | :--- |
-| `hi` | Hindi | Devanagari | 47 primary characters |
-| `mr` | Marathi | Devanagari | Shared character set with Hindi |
+| Code | Language |
+|------|----------|
+| `hi` | Hindi |
+| `mr` | Marathi |
+| `ne` | Nepali |
+
+### CJK (Chinese, Japanese, Korean)
+
+| Code | Language | Script |
+|------|----------|--------|
+| `zh` | Chinese | Hanzi |
+| `ja` | Japanese | Kanji + Kana |
+| `ko` | Korean | Hangul |
 
 ### Other Indic Scripts
 
-| Code | Language | Script | Notes |
-| :--- | :--- | :--- | :--- |
-| `bn` | Bengali | Bengali | 11 vowels, 39 consonants |
-| `ta` | Tamil | Tamil | 12 vowels, 18 consonants |
-| `te` | Telugu | Telugu | 16 vowels, 36 consonants |
-| `gu` | Gujarati | Gujarati | Placeholder |
-| `pa` | Punjabi | Gurmukhi | Placeholder |
-| `kn` | Kannada | Kannada | Placeholder |
-| `ml` | Malayalam | Malayalam | Placeholder |
+| Code | Language | Script |
+|------|----------|--------|
+| `bn` | Bengali | Bengali |
+| `ta` | Tamil | Tamil |
+| `te` | Telugu | Telugu |
+| `th` | Thai | Thai |
 
----
+## Usage
 
-## East Asian Languages
-
-| Code | Language | Script | Notes |
-| :--- | :--- | :--- | :--- |
-| `zh` | Chinese (Simplified) | Han | Common character subset |
-| `ja` | Japanese | Mixed | Hiragana + Katakana; Kanji requires extended vocabulary |
-| `ko` | Korean | Hangul | Jamo-based representation |
-
----
-
-## Southeast Asian Languages
-
-| Code | Language | Script | Notes |
-| :--- | :--- | :--- | :--- |
-| `th` | Thai | Thai | 44 consonants, 15 vowel symbols |
-| `vi` | Vietnamese | Latin | Extensive diacritic system (tones) |
-| `id` | Indonesian | Latin | Standard Latin |
-| `ms` | Malay | Latin | Standard Latin |
-
----
-
-## African Languages
-
-| Code | Language | Script | Notes |
-| :--- | :--- | :--- | :--- |
-| `sw` | Swahili | Latin | Standard Latin |
-| `af` | Afrikaans | Latin | Dutch-derived diacritics |
-
----
-
-## API Usage
-
-### Retrieving Language Profiles
+### Single Language
 
 ```python
-from thulium.data.language_profiles import get_language_profile, list_supported_languages
+from thulium import recognize_image
 
-# Get specific profile
-profile = get_language_profile("az")
-print(f"Language: {profile.name}")
+result = recognize_image("german_letter.png", language="de")
+```
+
+### Language Detection
+
+```python
+from thulium import recognize_image
+
+result = recognize_image("document.png", language="auto")
+print(f"Detected: {result.detected_language}")
+```
+
+### Language Profile Access
+
+```python
+from thulium.data.language_profiles import get_language_profile
+
+profile = get_language_profile("de")
+print(f"Name: {profile.name}")
 print(f"Script: {profile.script}")
-print(f"Alphabet size: {len(profile.alphabet)}")
-
-# List all supported languages
-languages = list_supported_languages()
-print(f"Supported: {len(languages)} languages")
+print(f"Alphabet: {profile.alphabet}")
 ```
 
-### Filtering by Region or Script
+## Script-Specific Processing
+
+### Right-to-Left Scripts
+
+Arabic, Hebrew, Persian, and Urdu are processed with automatic RTL handling:
 
 ```python
-from thulium.data.language_profiles import get_languages_by_region, get_languages_by_script
-
-# Get Scandinavian languages
-nordic = get_languages_by_region("Scandinavia")
-
-# Get all Cyrillic languages
-cyrillic = get_languages_by_script("Cyrillic")
+result = recognize_image("arabic.png", language="ar")
+# Returns properly ordered RTL text
 ```
 
----
+### CJK Scripts
 
-## Adding New Languages
+Chinese, Japanese, and Korean use specialized tokenization:
 
-To add support for a new language:
+```python
+result = recognize_image("japanese.png", language="ja")
+# Handles mixed Kanji/Hiragana/Katakana
+```
 
-1. Define the character set (alphabet)
-2. Create a `LanguageProfile` entry in `language_profiles.py`
-3. Optionally, create a language-specific pipeline configuration
-4. Run validation: `validate_language_profile(profile)`
+## See Also
 
-See [Contributing Guide](../../CONTRIBUTING.md) for detailed instructions.
+- [Model Zoo](model_zoo.md) — Pretrained models
+- [Benchmarks](../evaluation/benchmarks.md) — Per-language metrics

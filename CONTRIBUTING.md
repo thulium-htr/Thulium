@@ -1,118 +1,90 @@
 # Contributing to Thulium
 
-Thank you for your interest in contributing to **Thulium**. We strive to build a state-of-the-art multilingual handwriting recognition library and welcome contributions from the research and engineering community.
+Thank you for your interest in contributing to Thulium! This document provides
+guidelines for contributing to the project.
 
-This document provides guidelines for contributing to the project. Please read it carefully before submitting a Pull Request.
+## Code of Conduct
 
----
+All contributors must adhere to our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## 1. Code of Conduct
+## How to Contribute
 
-All contributors are expected to adhere to our [Code of Conduct](CODE_OF_CONDUCT.md). We are committed to providing a welcoming and inclusive environment for everyone.
+### Reporting Issues
 
----
+Before filing an issue:
 
-## 2. Development Workflow
+1. Search existing issues to avoid duplicates
+2. Use the issue template and provide:
+   - Thulium version (`thulium.__version__`)
+   - Python version
+   - Operating system
+   - Minimal reproducible example
+   - Full error traceback
 
-### 2.1 Environment Setup
+### Submitting Changes
 
-1. **Fork and Clone**:
+1. **Fork** the repository
+2. **Create a branch** from `main`:
    ```bash
-   git clone https://github.com/olaflaitinen/Thulium.git
-   cd Thulium
+   git checkout -b feature/your-feature-name
    ```
-
-2. **Virtual Environment**:
+3. **Make changes** following our style guide
+4. **Write tests** for new functionality
+5. **Run checks** before submitting:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # or venv\Scripts\activate on Windows
+   pytest tests/
+   mypy thulium/
+   ruff check thulium/
    ```
+6. **Submit a pull request** with a clear description
 
-3. **Install Dependencies**:
-   ```bash
-   pip install -e .[dev]
-   ```
-   This installs the package in editable mode along with all development dependencies (pytest, black, ruff, mypy).
-
-### 2.2 Branching Strategy
-
-- **main**: The stable production branch.
-- **develop**: The integration branch for next release (if applicable).
-- **feature/***`: Feature branches derived from main.
-- **fix/***`: Bug fix branches.
-
-### 2.3 Style Guide
-
-We enforce strict quality standards to ensure maintainability and robustness.
-
-- **Formatter**: [Black](https://github.com/psf/black) (line length: 88)
-- **Linter**: [Ruff](https://github.com/astral-sh/ruff)
-- **Type Checking**: [Mypy](http://mypy-lang.org/) (strict mode preferred)
-
-Run the quality suite before committing:
+## Development Setup
 
 ```bash
-# Format code
-black thulium tests
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/thulium.git
+cd thulium
 
-# Lint code
-ruff check thulium tests
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows
 
-# Type check
-mypy thulium
-```
+# Install in development mode
+pip install -e ".[dev]"
 
----
-
-## 3. Testing Standards
-
-All contributions must include comprehensive tests.
-
-### 3.1 Test Framework
-
-We use `pytest` for all testing. Tests are located in the `tests/` directory.
-
-### 3.2 Running Tests
-
-```bash
-# Run all tests
+# Run tests
 pytest
-
-# Run specific test file
-pytest tests/test_language_profiles.py
-
-# Run with coverage
-pytest --cov=thulium
 ```
 
-### 3.3 Coverage Requirements
+## Style Guide
 
-- New features must have 100% test coverage.
-- Bug fixes must include a regression test.
+All code must follow the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html).
 
----
+Key requirements:
 
-## 4. Pull Request Process
+- **Type annotations** for all public functions
+- **Docstrings** with Args, Returns, Raises sections
+- **Imports** ordered: `__future__`, stdlib, third-party, local
+- **Line length** maximum 88 characters
+- **`from __future__ import annotations`** in all modules
 
-1. **Title**: Use [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat: add attention decoder`, `fix: sequence length error`).
-2. **Description**: clear explanation of changes, reasoning, and any breaking changes.
-3. **Verification**: Confirm that all tests pass and linting is clean.
-4. **Review**: Wait for maintainers to review. Address feedback promptly.
+## Pull Request Checklist
 
----
+- [ ] Code follows the style guide
+- [ ] All tests pass locally
+- [ ] New functionality includes tests
+- [ ] Documentation updated if needed
+- [ ] Changelog entry added for user-facing changes
+- [ ] Commit messages are clear and descriptive
 
-## 5. Adding New Languages
+## Review Process
 
-To add support for a new language:
+1. A maintainer will review your PR within 5 business days
+2. Address any requested changes
+3. Once approved, a maintainer will merge your PR
 
-1. **Research**: Identify the script, alphabet, and writing direction.
-2. **Profile**: Add a new `LanguageProfile` in `thulium/data/language_profiles.py`.
-3. **Model**: Assign an appropriate `model_profile` (shared or new).
-4. **Test**: Add validation cases in `tests/test_language_profiles.py`.
-5. **Docs**: Update `docs/models/language_support.md`.
+## License
 
----
-
-## 6. License
-
-By contributing to Thulium, you agree that your contributions will be licensed under the Apache License 2.0.
+By contributing, you agree that your contributions will be licensed under the
+Apache 2.0 License.

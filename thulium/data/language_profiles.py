@@ -1,5 +1,18 @@
-"""
-Language profiles and alphabet definitions for Thulium.
+# Copyright 2025 Thulium Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Language profiles and alphabet definitions for Thulium.
 
 This module defines the character sets, script types, and language-specific
 configurations for 50+ supported languages. Each language profile includes
@@ -9,9 +22,14 @@ strategy, and default decoder/language model settings.
 The language support framework is designed to be extensible, allowing
 research teams to add new languages by defining appropriate profiles.
 """
+from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Callable
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Callable
+from typing import Dict
+from typing import List
+from typing import Optional
 
 
 class UnsupportedLanguageError(ValueError):

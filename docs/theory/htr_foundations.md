@@ -1,322 +1,125 @@
-# Theoretical Foundations of Handwriting Text Recognition
+# HTR Foundations
 
-This document provides the theoretical background for handwriting text recognition (HTR) as implemented in Thulium. It covers the mathematical formulations, architectural principles, and algorithmic foundations that underpin modern deep learning-based HTR systems.
+Background on handwriting text recognition.
 
----
+## What is HTR?
 
-## 1. Problem Formulation
+**Handwriting Text Recognition (HTR)** is the task of converting
+handwritten text images into machine-readable text. Unlike printed OCR,
+HTR must handle significant variability in writing styles.
 
-Handwriting text recognition is a sequence transduction problem where the goal is to convert an input image containing handwritten text into a corresponding character sequence.
-
-### 1.1 Formal Definition
-
-Given:
-- An input image `x` of shape `(H, W, C)` containing handwritten text
-- A vocabulary `V` of characters (alphabet, digits, punctuation)
-- A target sequence `y = (y_1, y_2, ..., y_T)` where `y_t in V`
-
-The objective is to learn a function:
+## HTR Pipeline
 
 ```
-f: X -> Y*
+Image → Preprocessing → Feature Extraction → Sequence Modeling → Decoding → Text
 ```
 
-that maps images to variable-length character sequences.
+### 1. Preprocessing
 
-### 1.2 Challenges
+- **Binarization** — Convert to binary (ink vs background)
+- **Deskewing** — Correct rotation
+- **Normalization** — Standardize height/width
 
-HTR differs from other sequence recognition tasks due to:
+### 2. Feature Extraction
 
-1. **Variable alignment**: The correspondence between image regions and output characters is not known a priori.
-2. **Intra-class variation**: The same character can have vastly different visual appearances across writers.
-3. **Inter-class similarity**: Different characters may look similar (e.g., 'l' and '1', 'e' and 'c').
-4. **Degradation**: Historical documents may have noise, fading, or damage.
-5. **Multilingual complexity**: Different scripts have different characteristics (directionality, ligatures, diacritics).
-
----
-
-## 2. Connectionist Temporal Classification (CTC)
-
-CTC is the foundational approach for alignment-free sequence recognition, enabling end-to-end training without explicit character-level annotations.
-
-### 2.1 Path Formulation
-
-For an input sequence of length `T_enc` and output vocabulary of size `K`, the network produces a probability distribution at each timestep:
+CNNs or Vision Transformers extract visual features:
 
 ```
-P(pi_t | x) for t = 1, ..., T_enc
+Image (H×W×C) → Backbone → Features (H'×W'×D)
 ```
 
-where `pi` is a "path" including blank tokens (denoted `phi`).
+### 3. Sequence Modeling
 
-### 2.2 Many-to-One Mapping
-
-CTC defines a mapping `B` that collapses paths to label sequences by:
-1. Removing consecutive duplicate characters
-2. Removing blank tokens
-
-For example: `B("a-a--b") = "aab"` and `B("aa-b") = "ab"` where `-` is blank.
-
-### 2.3 CTC Probability
-
-The probability of a label sequence `y` is the sum over all valid paths:
+RNNs or Transformers model temporal dependencies:
 
 ```
-P(y | x) = sum_{pi in B^{-1}(y)} P(pi | x)
+Features → BiLSTM/Transformer → Sequence (T×D)
 ```
 
-where:
+### 4. Decoding
+
+CTC or attention-based decoding produces text:
 
 ```
-P(pi | x) = prod_{t=1}^{T_enc} P(pi_t | x)
+Sequence → Decoder → Characters
 ```
 
-### 2.4 CTC Loss
+## CTC (Connectionist Temporal Classification)
 
-The CTC loss is the negative log-likelihood:
+CTC enables training without character-level alignment.
 
-```
-L_CTC = -ln P(y | x)
-```
+### Loss Function
 
-This is efficiently computed using the forward-backward algorithm in O(T_enc * T_out) time.
+$$
+L_{CTC} = -\log P(y | x) = -\log \sum_{\pi \in B^{-1}(y)} P(\pi | x)
+$$
 
-### 2.5 CTC Assumptions
+Where:
+- $y$ = target label sequence
+- $x$ = input sequence
+- $\pi$ = all paths that decode to $y$
+- $B^{-1}$ = inverse of the many-to-one mapping
 
-CTC makes specific assumptions:
-- Output sequence is shorter than input sequence
-- Monotonic alignment (output order matches input spatial order)
-- Conditional independence between frames given input
+### Decoding
 
----
+**Greedy:** Take argmax at each timestep.
 
-## 3. Attention-Based Sequence-to-Sequence
+**Beam Search:** Maintain top-k hypotheses.
 
-Attention mechanisms overcome CTC's monotonic alignment constraint by learning flexible alignments.
+## Attention Mechanism
 
-### 3.1 Encoder-Decoder Architecture
+Attention-based decoders learn explicit alignments:
 
-The encoder processes the input image:
+$$
+\alpha_{t,i} = \text{softmax}(e_{t,i})
+$$
 
-```
-H = Encoder(x)   # H: (T_enc, D)
-```
+$$
+c_t = \sum_i \alpha_{t,i} h_i
+$$
 
-The decoder generates output autoregressively:
+Where:
+- $\alpha_{t,i}$ = attention weight for output $t$, input $i$
+- $c_t$ = context vector
+- $h_i$ = encoder hidden states
 
-```
-P(y_t | y_{<t}, H) = Decoder(y_{<t}, H)
-```
+## Language Models
 
-### 3.2 Attention Mechanism
+Language models improve accuracy by scoring hypotheses:
 
-At decoding step `t`, attention computes context vector `c_t`:
+$$
+\text{Score}(y) = \log P_{HTR}(y|x) + \alpha \cdot \log P_{LM}(y)
+$$
 
-```
-e_{t,i} = score(s_{t-1}, h_i)
-alpha_{t,i} = softmax(e_{t,:})_i
-c_t = sum_i alpha_{t,i} * h_i
-```
+### Types
 
-Common scoring functions:
-- Dot product: `score(s, h) = s^T h`
-- Additive: `score(s, h) = v^T tanh(W_s s + W_h h)`
-- Scaled dot product: `score(s, h) = (s^T h) / sqrt(d)`
+- **N-gram** — Statistical, fast, limited context
+- **Neural** — RNN/Transformer, better context, slower
 
-### 3.3 Training with Teacher Forcing
+## Evaluation Metrics
 
-During training, the decoder receives ground truth tokens:
+| Metric | Level | Formula |
+|--------|-------|---------|
+| CER | Character | $(S + D + I) / N$ |
+| WER | Word | $(S_w + D_w + I_w) / N_w$ |
+| SER | Sequence | 1 if error, 0 otherwise |
 
-```
-L_CE = -sum_t ln P(y_t | y_{<t}, H)
-```
+## Challenges
 
-This is cross-entropy loss with label smoothing option.
+| Challenge | Description |
+|-----------|-------------|
+| Style Variation | Different writers have unique styles |
+| Historical Scripts | Old documents use archaic letterforms |
+| Low Quality | Faded ink, damaged paper |
+| Mixed Scripts | Documents mixing languages |
 
----
+## Further Reading
 
-## 4. Language Model Integration
+- [Graves et al., 2006](https://dl.acm.org/doi/10.1145/1143844.1143891) — CTC
+- [Bahdanau et al., 2015](https://arxiv.org/abs/1409.0473) — Attention
+- [Shi et al., 2017](https://arxiv.org/abs/1507.05717) — CRNN for OCR
 
-Language models provide prior knowledge about likely character sequences, improving recognition accuracy.
+## See Also
 
-### 4.1 Shallow Fusion
-
-During decoding, LM scores are combined with acoustic/visual scores:
-
-```
-score(y) = log P_HTR(y | x) + alpha * log P_LM(y) + beta * |y|
-```
-
-where:
-- `alpha` is the LM weight (hyperparameter)
-- `beta` is the word/character insertion bonus
-- `|y|` is the sequence length
-
-### 4.2 Beam Search with LM
-
-For CTC, beam search maintains multiple hypotheses:
-
-1. Initialize with empty sequence
-2. At each timestep, extend all beams with all tokens
-3. Score extensions: `new_score = old_score + log P_CTC(c) + alpha * log P_LM(c|prefix)`
-4. Prune to top-K beams
-5. Return highest-scoring complete sequence
-
-### 4.3 N-gram Language Models
-
-Character n-gram models estimate:
-
-```
-P(c_t | c_{t-n+1:t-1}) = count(c_{t-n+1:t}) / count(c_{t-n+1:t-1})
-```
-
-With smoothing to handle unseen sequences (add-k, interpolation, backoff).
-
----
-
-## 5. Neural Network Architectures
-
-### 5.1 CNN Feature Extraction
-
-Convolutional networks extract local visual features:
-
-```
-F = CNN(x)   # F: (H', W', C')
-```
-
-Key design choices for HTR:
-- Asymmetric pooling (more vertical than horizontal)
-- Residual connections for depth
-- Batch normalization for training stability
-
-### 5.2 Recurrent Sequence Modeling
-
-Bidirectional LSTMs process feature sequences:
-
-```
-h_t^{fwd} = LSTM_{fwd}(f_t, h_{t-1}^{fwd})
-h_t^{bwd} = LSTM_{bwd}(f_t, h_{t+1}^{bwd})
-h_t = [h_t^{fwd}; h_t^{bwd}]
-```
-
-This captures both left and right context for each position.
-
-### 5.3 Transformer Architecture
-
-Self-attention enables global context modeling:
-
-```
-Attention(Q, K, V) = softmax(QK^T / sqrt(d_k)) V
-```
-
-Multi-head attention:
-
-```
-MultiHead(Q, K, V) = Concat(head_1, ..., head_h) W^O
-head_i = Attention(Q W_i^Q, K W_i^K, V W_i^V)
-```
-
-### 5.4 Vision Transformers (ViT)
-
-ViT processes images as sequences of patches:
-
-1. Split image into patches of size `(P, P)`
-2. Flatten and project: `z_i = x_i^{patch} E + pos_i`
-3. Apply Transformer encoder layers
-4. Output sequence for CTC or as encoder for attention decoder
-
----
-
-## 6. Evaluation Metrics
-
-### 6.1 Character Error Rate (CER)
-
-```
-CER = (S + D + I) / N
-```
-
-where:
-- S = substitutions
-- D = deletions
-- I = insertions
-- N = total reference characters
-
-### 6.2 Word Error Rate (WER)
-
-Same formula applied at word level:
-
-```
-WER = (S_w + D_w + I_w) / N_w
-```
-
-### 6.3 Sequence Error Rate (SER)
-
-```
-SER = 1 if reference != hypothesis else 0
-```
-
-Binary indicator aggregated over samples.
-
----
-
-## 7. Thulium Architecture
-
-Thulium implements a modular architecture allowing flexible component composition:
-
-```
-                    +---------------+
-                    |  Input Image  |
-                    +-------+-------+
-                            |
-                    +-------v-------+
-                    |   Backbone    |
-                    | (CNN or ViT)  |
-                    +-------+-------+
-                            |
-                    +-------v-------+
-                    | Sequence Head |
-                    |(LSTM/Transf.) |
-                    +-------+-------+
-                            |
-              +-------------+-------------+
-              |                           |
-      +-------v-------+           +-------v-------+
-      |  CTC Decoder  |           | Attn Decoder  |
-      +-------+-------+           +-------+-------+
-              |                           |
-              +-------------+-------------+
-                            |
-                    +-------v-------+
-                    | Language Model|
-                    |   Rescoring   |
-                    +-------+-------+
-                            |
-                    +-------v-------+
-                    |    Output     |
-                    +---------------+
-```
-
-This modularity enables:
-- Easy experimentation with different components
-- Language-specific configurations via profiles
-- Trade-offs between accuracy and speed
-
----
-
-## 8. Historical Perspective
-
-HTR has evolved through several paradigms:
-
-1. **Rule-based systems** (1960s-1980s): Hand-crafted features and rules
-2. **Statistical methods** (1980s-2000s): HMMs with Gaussian mixture emissions
-3. **Hybrid NN-HMM** (2000s-2010s): Neural networks for feature extraction, HMMs for sequence modeling
-4. **CNN-RNN-CTC** (2014-2018): End-to-end deep learning with CTC
-5. **Transformer-based** (2019-present): Self-attention replacing recurrence
-
-Thulium supports architectures from the CNN-RNN-CTC era through modern Transformer approaches.
-
----
-
-## References
-
-The theoretical foundations draw from established literature in sequence recognition, including foundational work on CTC, attention mechanisms, and transformer architectures. Thulium integrates these established principles while providing a unified, language-aware implementation framework.
+- [Architecture](../architecture.md) — Thulium architecture
+- [Model Zoo](../models/model_zoo.md) — Pretrained models

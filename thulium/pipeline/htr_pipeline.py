@@ -1,254 +1,218 @@
-"""
-HTR Pipeline - Core handwriting text recognition orchestration.
+# Copyright 2025 Thulium Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""HTR Pipeline - Core handwriting text recognition orchestration.
 
 This module provides the main HTRPipeline class that orchestrates the
 complete workflow from raw image input to structured text output,
 integrating preprocessing, segmentation, recognition, and postprocessing.
+
+Classes:
+    HTRPipeline: Main pipeline for end-to-end handwriting recognition.
+
+Example:
+    >>> from thulium.pipeline.htr_pipeline import HTRPipeline
+    >>> pipeline = HTRPipeline(device="cuda", language="en")
+    >>> result = pipeline.process("document.jpg")
+    >>> print(result.full_text)
 """
 
-from typing import Union, Optional
-from pathlib import Path
+from __future__ import annotations
+
 import logging
+from pathlib import Path
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
-from thulium.api.types import PageResult, Line
+import torch
+import yaml
+from PIL import Image
+
+from thulium.api.types import Line
+from thulium.api.types import PageResult
+from thulium.data.language_profiles import get_language_profile
+from thulium.data.language_profiles import LanguageProfile
 from thulium.data.loaders import load_image
-from thulium.data.language_profiles import (
-    get_language_profile,
-    LanguageProfile,
-    UnsupportedLanguageError,
-)
+from thulium.models.segmentation.line_segmentation import LineSegmenter
 from thulium.models.wrappers.htr_model import HTRModel
-
 
 logger = logging.getLogger(__name__)
 
 
 class HTRPipeline:
-    """
-    Orchestrates the handwriting text recognition pipeline.
+    """Orchestrates the handwritten text recognition process.
 
-    This class manages the complete HTR workflow including:
-    - Image loading and preprocessing
-    - Layout segmentation (line/word detection)
-    - Text recognition via deep learning models
-    - Language-aware decoding and postprocessing
-
-    The pipeline is configurable via YAML configuration files and
-    supports language-specific settings through the language profiles.
+    This class binds together the segmentation, recognition, and decoding
+    components into a cohesive pipeline. It handles device management,
+    configuration loading, and the execution flow for both single images
+    and batches.
 
     Attributes:
-        config: Pipeline configuration dictionary.
-        device: Computation device ('cpu', 'cuda', or 'auto').
-        model: The HTR model instance.
-        language_profile: Optional cached language profile.
-
-    Example:
-        >>> from thulium.pipeline.htr_pipeline import HTRPipeline
-        >>> from thulium.pipeline.config import load_pipeline_config
-        >>> config = load_pipeline_config("default")
-        >>> pipeline = HTRPipeline(config)
-        >>> result = pipeline.process("document.png", language="en")
-        >>> print(result.full_text)
+        device: Torch device (CPU or CUDA).
+        segmenter: Line segmentation model.
+        recognizer: HTR recognition model.
     """
 
     def __init__(
         self,
-        config: dict,
+        config_path: Optional[str] = None,
         device: str = "auto",
-        language: Optional[str] = None
-    ):
-        """
-        Initialize the HTR pipeline with configuration.
+        language: str = "en",
+    ) -> None:
+        """Initialize the pipeline.
 
         Args:
-            config: Pipeline configuration dictionary.
-            device: Computation device ('cpu', 'cuda', or 'auto').
-            language: Optional default language code.
+            config_path: Path to YAML configuration file.
+            device: 'auto', 'cpu', or 'cuda'.
+            language: Default language code.
         """
-        self.config = config
         self.device = self._resolve_device(device)
-        self.language_profile: Optional[LanguageProfile] = None
-
-        # Load language profile if specified
-        if language:
-            self._load_language_profile(language)
-
-        # Initialize model (stub - would load actual weights in production)
-        num_classes = self._get_num_classes()
-        self.model = HTRModel(num_classes=num_classes)
-
-        logger.info(
-            "Initialized HTRPipeline with device=%s, num_classes=%d",
-            self.device,
-            num_classes
-        )
-
-    def _resolve_device(self, device: str) -> str:
-        """Resolve 'auto' device to actual device string."""
-        if device == "auto":
-            try:
-                import torch
-                return "cuda" if torch.cuda.is_available() else "cpu"
-            except ImportError:
-                return "cpu"
-        return device
-
-    def _load_language_profile(self, language: str) -> None:
-        """
-        Load and cache the language profile for the given code.
-
-        Args:
-            language: ISO 639-1 language code.
-
-        Raises:
-            UnsupportedLanguageError: If language is not supported.
-        """
+        self.config = self._load_config(config_path) if config_path else {}
         self.language_profile = get_language_profile(language)
-        logger.info(
-            "Loaded language profile: %s (%s script)",
-            self.language_profile.name,
-            self.language_profile.script
-        )
 
-    def _get_num_classes(self) -> int:
-        """
-        Determine the number of output classes based on language profile.
+        logger.info("Initializing HTRPipeline on %s for %s", self.device, language)
 
-        Returns:
-            Number of classes for the decoder output layer.
-        """
-        if self.language_profile:
-            return self.language_profile.get_vocab_size()
-        # Default fallback for generic Latin
-        return 100
+        # Initialize Models
+        # In a real scenario, we would load weights here.
+        self.segmenter = LineSegmenter(in_channels=3).to(self.device)
+        self.recognizer = HTRModel(
+            num_classes=self.language_profile.get_vocab_size()
+        ).to(self.device)
 
-    def process(
-        self,
-        image_path: Union[str, Path],
-        language: str = "en"
-    ) -> PageResult:
-        """
-        Run the full recognition pipeline on a single image.
+        self.segmenter.eval()
+        self.recognizer.eval()
 
-        This method executes the complete pipeline:
-        1. Load and preprocess the input image
-        2. Perform layout segmentation (if enabled)
-        3. Run text recognition on segments
-        4. Apply language-aware decoding
-        5. Postprocess and structure the output
+    def _resolve_device(self, device_str: str) -> torch.device:
+        """Resolve device string to torch.device."""
+        if device_str == "auto":
+            return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        return torch.device(device_str)
+
+    def _load_config(self, path: str) -> Dict[str, Any]:
+        """Load configuration from YAML."""
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return yaml.safe_load(f)
+        except Exception as e:
+            logger.warning("Failed to load config %s: %s. Using API defaults.", path, e)
+            return {}
+
+    def process(self, image_source: Union[str, Path, Image.Image]) -> PageResult:
+        """Process a single document image.
 
         Args:
-            image_path: Path to the input image file.
-            language: Language code for recognition (e.g., 'en', 'az').
+            image_source: Path to image or PIL Image object.
 
         Returns:
-            PageResult containing recognized text and metadata.
-
-        Raises:
-            FileNotFoundError: If the image file does not exist.
-            UnsupportedLanguageError: If the language is not supported.
+            PageResult containing recognized text and layout info.
         """
-        image_path = Path(image_path)
-        logger.info("Processing %s with language=%s", image_path, language)
+        # 1. Load Image
+        if isinstance(image_source, (str, Path)):
+            image = load_image(image_source)
+        else:
+            image = image_source
 
-        # Load language profile if different from cached
-        if not self.language_profile or self.language_profile.code != language:
-            self._load_language_profile(language)
+        # 2. Preprocess & Segment
+        # Convert to tensor
+        import torchvision.transforms.functional as TF
+        img_tensor = TF.to_tensor(image).unsqueeze(0).to(self.device)
 
-        # Step 1: Load Image
-        image = load_image(image_path)
-        logger.debug("Loaded image: %dx%d", image.width, image.height)
+        # Run segmenter
+        with torch.no_grad():
+            seg_map = self.segmenter(img_tensor)
+            # Post-process segmentation map to get bounding boxes
+            # This is a complex step usually involving connected components
+            # For this 'from scratch' impl, we'll simulate output or use simple thresholding
+            line_bboxes = self._extract_bboxes_from_mask(seg_map, image.size)
 
-        # Step 2: Preprocessing (placeholder)
-        # In production, apply normalization, binarization, etc.
+        # 3. Recognize Lines
+        recognized_lines = []
+        for bbox in line_bboxes:
+            # Crop line
+            x, y, w, h = bbox
+            line_img = image.crop((x, y, x + w, y + h))
+            
+            # Recognize
+            text, conf = self._recognize_line(line_img)
+            
+            recognized_lines.append(
+                Line(text=text, confidence=conf, bbox=bbox)
+            )
 
-        # Step 3: Segmentation (placeholder)
-        # Returns list of line bounding boxes
-        # For now, treat entire image as single line
-        lines = self._segment_lines(image)
-
-        # Step 4: Recognition (placeholder)
-        # Run HTR model on each segment
-        recognized_lines = self._recognize_segments(lines, image)
-
-        # Step 5: Construct output
-        full_text = "\n".join([line.text for line in recognized_lines])
-
+        # 4. Construct Result
+        full_text = "\n".join([l.text for l in recognized_lines])
+        
         return PageResult(
             full_text=full_text,
             lines=recognized_lines,
-            language=language,
-            metadata={
-                "device": self.device,
-                "language_profile": self.language_profile.name if self.language_profile else None,
-                "script": self.language_profile.script if self.language_profile else None,
-            }
+            language=self.language_profile.code,
+            metadata={"device": str(self.device)}
         )
 
-    def _segment_lines(self, image) -> list:
-        """
-        Segment the image into text lines.
-
-        This is a placeholder implementation. In production, this would
-        use a trained segmentation model (e.g., U-Net) to detect lines.
-
+    def _extract_bboxes_from_mask(self, seg_map: torch.Tensor, original_size: Tuple[int, int]) -> List[Tuple[int, int, int, int]]:
+        """Extract bounding boxes from segmentation probability map.
+        
         Args:
-            image: PIL Image object.
-
+            seg_map: (1, 1, H, W) tensor.
+            original_size: (W, H) tuple.
+            
         Returns:
-            List of bounding boxes for detected lines.
+             List of (x, y, w, h) tuples.
         """
-        # Placeholder: return entire image as single line
-        return [(0, 0, image.width, image.height)]
+        # Real implementation would use cv2.findContours or kornia
+        # Here we provide a heuristic fallback if no segments found (e.g. init weights)
+        # to ensure pipeline runs end-to-end.
+        
+        # In a real trained model, seg_map > 0.5 would give binary mask.
+        prob = torch.sigmoid(seg_map)
+        if prob.max() < 0.1:
+             # Fallback: treat whole image as one line if model is untrained
+             return [(0, 0, original_size[0], original_size[1])]
+        
+        # Placeholder for connected components logic
+        # Current logic: One big box
+        return [(0, 0, original_size[0], original_size[1])]
 
-    def _recognize_segments(self, segments: list, image) -> list:
-        """
-        Run recognition on segmented regions.
-
-        This is a placeholder implementation. In production, this would
-        crop each segment and run the HTR model.
-
-        Args:
-            segments: List of bounding boxes (x, y, w, h).
-            image: PIL Image object.
-
-        Returns:
-            List of Line objects with recognized text.
-        """
-        # Placeholder: return baseline text for each segment
-        results = []
-        for i, bbox in enumerate(segments):
-            # In production: crop, preprocess, run model, decode
-            text = f"[Thulium {self.language_profile.name if self.language_profile else 'Generic'} Line {i+1}]"
-            results.append(
-                Line(
-                    text=text,
-                    confidence=0.99,
-                    bbox=bbox
-                )
-            )
-        return results
-
-
-def create_pipeline_from_config(
-    config_name: str,
-    device: str = "auto",
-    language: Optional[str] = None
-) -> HTRPipeline:
-    """
-    Create an HTR pipeline from a named configuration.
-
-    This is a convenience factory function that loads the configuration
-    and creates the pipeline instance.
-
-    Args:
-        config_name: Name of the configuration (e.g., 'htr_en_default').
-        device: Computation device.
-        language: Optional language override.
-
-    Returns:
-        Configured HTRPipeline instance.
-    """
-    from thulium.pipeline.config import load_pipeline_config
-    config = load_pipeline_config(config_name)
-    return HTRPipeline(config, device=device, language=language)
+    def _recognize_line(self, line_img: Image.Image) -> Tuple[str, float]:
+        """Run recognition on a single line image."""
+        # Preprocess
+        import torchvision.transforms.functional as TF
+        # Resize height to fixed size (e.g. 32 or 64)
+        target_height = 64
+        w, h = line_img.size
+        new_w = int(w * (target_height / h))
+        line_img = line_img.resize((new_w, target_height), Image.Resampling.BILINEAR)
+        
+        tensor = TF.to_tensor(line_img).unsqueeze(0).to(self.device)
+        
+        with torch.no_grad():
+            log_probs = self.recognizer(tensor) # (T, B, C)
+            
+            # Decode
+            # This calls the greedy decoder inside the recognizer manually or via helper
+            # recognizer.forward returns log_probs. We need decoder.decode_greedy
+            preds = self.recognizer.decoder.decode_greedy(log_probs.transpose(0, 1))
+            
+            # TODO: Convert indices to text using Vocabulary
+            # For now, return string representation of indices
+            pred_indices = preds[0]
+            # text = "".join([self.vocab[i] for i in pred_indices])
+            text = f"Recognized: {pred_indices}" 
+            confidence = 0.9 # Placeholder
+            
+        return text, confidence

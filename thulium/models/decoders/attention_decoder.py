@@ -1,5 +1,18 @@
-"""
-Attention-based Decoder for Sequence-to-Sequence HTR.
+# Copyright 2025 Thulium Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Attention-based Decoder for Sequence-to-Sequence HTR.
 
 This module provides an autoregressive decoder using cross-attention
 for handwriting text recognition. Unlike CTC-based approaches that
@@ -27,9 +40,11 @@ At each decoding step t, given encoder outputs H and previous tokens y_{<t}:
 The decoder uses causal masking to ensure each position can only
 attend to earlier positions during training (teacher forcing).
 """
+from __future__ import annotations
 
 import math
-from typing import Optional, List
+from typing import List
+from typing import Optional
 
 import torch
 import torch.nn as nn

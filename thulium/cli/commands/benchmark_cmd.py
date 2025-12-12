@@ -1,100 +1,138 @@
-"""
-Benchmark CLI command for Thulium.
+# Copyright 2025 Thulium Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-Provides command-line interface for running benchmarks.
+"""Benchmark CLI Command.
+
+This module exposes benchmarking capabilities via the CLI. It allows running
+evaluation suites defined in YAML configuration files and exporting the results
+in various formats (Markdown, CSV, JSON).
 """
+
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Optional
 
 import typer
-from pathlib import Path
-from typing import Optional, List
-import logging
 
-app = typer.Typer(help="Run HTR benchmarks")
+from thulium.evaluation.benchmarking import run_benchmark
+from thulium.evaluation.reporting import (
+    generate_csv_report,
+    generate_json_report,
+    generate_markdown_report,
+    save_report,
+)
+
 logger = logging.getLogger(__name__)
 
+app = typer.Typer(help="Run HTR benchmarks.")
 
-@app.command()
-def run(
+
+@app.command(name="run")
+def run_benchmark_command(
     config: Path = typer.Argument(
         ...,
-        help="Path to benchmark configuration YAML file"
+        exists=True,
+        help="Path to the benchmark configuration YAML file.",
+        resolve_path=True,
     ),
     output: Optional[Path] = typer.Option(
         None,
-        "--output", "-o",
-        help="Output path for results (auto-detects format from extension)"
+        "--output",
+        "-o",
+        help="Path to save the benchmark report.",
+        writable=True,
     ),
-    format: str = typer.Option(
+    report_format: str = typer.Option(
         "markdown",
-        "--format", "-f",
-        help="Output format: markdown, csv, json"
+        "--format",
+        "-f",
+        help="Output report format: 'markdown', 'csv', or 'json'.",
     ),
     verbose: bool = typer.Option(
         False,
-        "--verbose", "-v",
-        help="Enable verbose output"
+        "--verbose",
+        "-v",
+        help="Enable verbose output during benchmarking.",
     ),
     include_samples: bool = typer.Option(
         False,
         "--include-samples",
-        help="Include per-sample results in output"
+        help="Include individual sample predictions in the report.",
     ),
-):
+) -> None:
     """
-    Run a benchmark evaluation from a configuration file.
-    
-    Example:
-        thulium benchmark run config/eval/iam_en.yaml
-        thulium benchmark run config/eval/global_mixed.yaml -o results.md
+    Execute a benchmark suite.
+
+    Runs the evaluation pipeline as defined in the provided configuration file.
+    Calculates metrics such as CER, WER, and SER.
     """
-    from thulium.evaluation.benchmarking import run_benchmark
-    from thulium.evaluation.reporting import (
-        generate_markdown_report,
-        generate_csv_report,
-        generate_json_report,
-        save_report
-    )
-    
-    if not config.exists():
-        typer.echo(f"Error: Config file not found: {config}", err=True)
+    logger.info("Starting benchmark using config: %s", config)
+
+    try:
+        # Run Benchmark
+        result = run_benchmark(str(config), verbose=verbose)
+
+        # Generate Report Content
+        if report_format == "markdown":
+            report_content = generate_markdown_report(result, include_samples=include_samples)
+        elif report_format == "csv":
+            report_content = generate_csv_report(result, include_samples=include_samples)
+        elif report_format == "json":
+            report_content = generate_json_report(result, include_samples=include_samples)
+        else:
+            logger.error("Unknown format: %s. Supported: markdown, csv, json", report_format)
+            raise typer.Exit(1)
+
+        # Output Handling
+        if output:
+            save_report(result, str(output), format=report_format, include_samples=include_samples)
+            logger.info("Benchmark results saved to %s", output)
+        else:
+            # Print to stdout
+            typer.echo(report_content)
+
+        # Summary Log
+        logger.info(
+            "Benchmark Complete. Aggregate CER: %.2f%%, WER: %.2f%%",
+            result.aggregate_cer * 100,
+            result.aggregate_wer * 100,
+        )
+
+    except Exception as e:
+        logger.error("Benchmarking failed: %s", e)
+        if verbose:
+            logger.exception("Traceback:")
         raise typer.Exit(1)
-    
-    typer.echo(f"Running benchmark: {config}")
-    
-    result = run_benchmark(str(config), verbose=verbose)
-    
-    if format == "markdown":
-        report = generate_markdown_report(result, include_samples=include_samples)
-    elif format == "csv":
-        report = generate_csv_report(result, include_samples=include_samples)
-    elif format == "json":
-        report = generate_json_report(result, include_samples=include_samples)
-    else:
-        typer.echo(f"Unknown format: {format}", err=True)
-        raise typer.Exit(1)
-    
-    if output:
-        save_report(result, output, format=format, include_samples=include_samples)
-        typer.echo(f"Results saved to: {output}")
-    else:
-        typer.echo(report)
-    
-    typer.echo("")
-    typer.echo(f"Summary: CER={result.aggregate_cer*100:.2f}%, WER={result.aggregate_wer*100:.2f}%")
 
 
-@app.command("list")
-def list_configs():
+@app.command(name="list")
+def list_configs() -> None:
     """List available benchmark configurations."""
     config_dir = Path("config/eval")
-    if not config_dir.exists():
-        typer.echo("No benchmark configs found in config/eval/")
-        return
     
-    typer.echo("Available benchmark configurations:")
-    for config_file in sorted(config_dir.glob("*.yaml")):
+    if not config_dir.exists():
+        logger.warning("Config directory not found: config/eval")
+        return
+
+    configs = sorted(config_dir.glob("*.yaml"))
+    
+    if not configs:
+        typer.echo("No benchmark configurations found in config/eval/")
+        return
+
+    typer.echo("Available Benchmark Configurations:")
+    for config_file in configs:
         typer.echo(f"  - {config_file}")
-
-
-if __name__ == "__main__":
-    app()

@@ -1,5 +1,18 @@
-"""
-Benchmark result reporting and export utilities.
+# Copyright 2025 Thulium Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Benchmark result reporting and export utilities.
 
 This module provides tools for generating formatted reports
 from benchmark results in multiple output formats:
@@ -12,14 +25,21 @@ The reporting utilities support per-language breakdowns,
 model comparisons, and illustrative performance summaries.
 """
 
-from typing import Dict, List, Any, Optional, Union
-from pathlib import Path
-import json
+from __future__ import annotations
+
 import csv
 import io
+import json
 from datetime import datetime
+from pathlib import Path
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
-from thulium.evaluation.benchmarking import BenchmarkResult, LanguageResult
+from thulium.evaluation.benchmarking import BenchmarkResult
+from thulium.evaluation.benchmarking import LanguageResult
 
 
 def generate_markdown_report(

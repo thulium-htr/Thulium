@@ -5,15 +5,27 @@ All notable changes to Thulium are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.1] - 2025-12-12
 
 ### Added
+- **PyTorch Hub Support**: Load models directly via `torch.hub.load('olaflaitinen/Thulium', ...)`
+- **Documentation Overhaul**: Complete rewrite of all documentation to Google Open Source standards
+- **Interactive Notebooks**: Added Colab-ready notebooks for quickstart, benchmarking, and error analysis
+- **Professional Standards**: Added SECURITY.md, SUPPORT.md, AUTHORS.md, and CITATION.cff
+- **GitHub Automation**: Added workflows for documentation deployment and PyPI publishing
+
+### Changed
+- Standardized all Python files with proper type annotations (PEP 561 compliance)
+- Updated repository structure to match professional Python library standards
+- Improved error handling in CLI commands
+
+## [1.2.0] - 2025-12-11
+
+### Added
+- Initial support for PyTorch Hub configuration
 - Expanded language support to 52+ languages
 - ONNX export for production deployment
 - Confidence calibration utilities
-
-### Changed
-- Improved CER by 15% on low-resource languages
 
 ## [1.1.0] - 2025-01-15
 

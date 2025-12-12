@@ -23,12 +23,12 @@ Attributes:
 Example:
     >>> from thulium.version import __version__
     >>> print(__version__)
-    '1.2.0'
+    '1.2.1'
 """
 
 from __future__ import annotations
 
-__version__: str = "1.2.0"
+__version__: str = "1.2.1"
 """Current version of the Thulium package following semantic versioning."""
 
 __all__ = ["__version__"]
